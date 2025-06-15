@@ -30,6 +30,15 @@ function Game() {
     const problem = operation === "+" ? addProblem : operation === "-" ? subtractProblem : multiplyProblem;
     const generateNewProblem = operation === "+" ? newAddProblem : operation === "-" ? newSubtractProblem : newMultiplyProblem;
     
+    /* Task: Add new feature - Division  */
+    // 1. Create separate hook useGameDivide.js
+    // 2. Edit consts problem and generateNewProblem to dynamically respond when operation === "×"
+    // 3. Edit consts problem and generateNewProblem to dynamically respond when operation === "÷" 
+
+    /* Task: Fix bugs */
+    // 4. a new problem should be generate when answer is submitted for substract and multiply problems (currently only works for add problems)
+    
+    /* Task: Create logic for editing answer before submitting  */
 
     const handleNumberClick = (number) => {
         setUserAnswer((prev) => (parseInt(prev || "0") * 10 + number).toString());
@@ -99,11 +108,11 @@ function Game() {
     return (
         <div>
             
-            <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center'}}>
+            <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', backgroundColor: '#f7edc6'}}>
                 <Header score={score} correct={correct} total={total} feedback={feedback} />
             </div>
 
-            <div style={{ display: "flex", gap: "10px", justifyContent: "center", margin: "10px 0" }}>
+            <div style={{ display: "flex", gap: "10px", justifyContent: "center", marginTop: "10px 0", backgroundColor: '#cef0d9' }}>
                <div style={{ display: "flex", flexDirection: "row", alignItems: "center", gap: "10px" }}>
                <img
                     src={addIcon}
@@ -165,7 +174,8 @@ function Game() {
                 justifyContent: 'center', 
                 alignItems: 'center',
                 fontSize: '50px',
-                color: '#89CFF0'
+                color: '#808080',
+                backgroundColor: '#f7edc6'
                 }}>
                 <p>{problem.term1} {problem.symbol} {problem.term2} = {userAnswer || "?"}</p>
             </div>
@@ -173,8 +183,8 @@ function Game() {
             <Answer onNumberClick={handleNumberClick} />
     
 
-            <div style={{ display: "flex", gap: "10px", justifyContent: "center", margin: "10px 0" }}>
-                <div style={{ display: "flex", flexDirection: "row", alignItems: "center", marginTop: "20px", gap: "10px" }}>
+            <div style={{ display: "flex", gap: "10px", justifyContent: "center", marginTop: "10px 0", backgroundColor: '#f7edc6' }}>
+                <div style={{ display: "flex", flexDirection: "row", alignItems: "center", margin: "10px 0", gap: "10px" }}>
                     <img
                         src={enterButton}
                         alt="Enter"
