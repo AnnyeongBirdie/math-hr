@@ -39,6 +39,8 @@ function Game() {
 
         const isCorrect = parseFloat(userAnswer) === problem.solution;
 
+        setUserAnswer("");
+
         setTimeout(() => {
             if (isCorrect) {
                 setCorrect(prev => {
@@ -76,10 +78,12 @@ function Game() {
     const handleNewProblem = () => {
         generateNewProblem();
         setFeedback(""); 
+        setUserAnswer("");
     };
 
     const resetScore = () => {
         setFeedback("");
+        setUserAnswer("");
         setCorrect(0);
         setWrong(0);
         localStorage.setItem("correct", 0);
