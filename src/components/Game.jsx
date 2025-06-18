@@ -19,7 +19,8 @@ import clickSound from "../assets/sounds/mouse-click-153941.mp3";
 import successSound from "../assets/sounds/short-success-sound-glockenspiel-treasure-video-game-6346.mp3";
 import errorSound from "../assets/sounds/error-11-352286.mp3";
 import newSound from "../assets/sounds/new-notification-09-352705.mp3";
-import resetSound from "../assets/sounds/bright-notification-352449.mp3";
+import resetSound from "../assets/sounds/harp-flourish-6251.mp3";
+import switchSound from "../assets/sounds/noisy-switch-166327.mp3";
 
 
 function Game() {
@@ -36,6 +37,7 @@ function Game() {
     const errorAudio = new Audio(errorSound);
     const newAudio = new Audio(newSound);
     const resetAudio = new Audio(resetSound);
+    const switchAudio = new Audio(switchSound);
     const playSound = (audio) => {
         audio.currentTime = 0;
         audio.play();
@@ -168,6 +170,7 @@ function Game() {
                     src={addIcon}
                     alt="Addition"
                     onClick={() => {
+                        playSound(switchAudio);
                         setOperation("+"); 
                         setHasSubmitted(false);
                     }}
@@ -183,6 +186,7 @@ function Game() {
                     src={subtractIcon}
                     alt="Subtraction"
                     onClick={() => {
+                        playSound(switchAudio);
                         setOperation("-");
                         setHasSubmitted(false);
                     }}
@@ -198,6 +202,7 @@ function Game() {
                     src={multiplyIcon}
                     alt="Multiplication"
                     onClick={() => {
+                        playSound(switchAudio);
                         setOperation("×"); 
                         setHasSubmitted(false);
                     }}
@@ -214,6 +219,7 @@ function Game() {
                     src={divideIcon}
                     alt="Division"
                     onClick={() => {
+                        playSound(switchAudio);
                         setOperation("÷"); 
                         setHasSubmitted(false);
                     }}

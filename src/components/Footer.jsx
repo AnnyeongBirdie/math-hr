@@ -5,7 +5,7 @@ function Footer() {
     const year = new Date().getFullYear();
     return (
         <footer style={{fontSize: "12px", color: "gray"}}>
-            <p>Copyright ⓒ {year} YourMom</p>
+            <p>Copyright ⓒ {year} AnnyeongBirdie</p>
         </footer>
     );
 }
