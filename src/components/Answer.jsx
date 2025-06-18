@@ -15,7 +15,7 @@ const numberImages = [num0, num1, num2, num3, num4, num5, num6, num7, num8, num9
 
 function Answer({ onNumberClick }) {
     return (
-      <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", gap: "10px", marginTop: "10px 0", maxWidth: "350px", backgroundColor: '#f7edc6' }}>
+      <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", gap: "10px", marginTop: "10px 0", maxWidth: "350px", backgroundColor: '#FFFFFF' }}>
         {numberImages.map((src, i) => (
           <React.Fragment key={i}>
             <img
