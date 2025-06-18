@@ -160,11 +160,11 @@ function Game() {
     return (
         <div>
             
-            <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', backgroundColor: '#FFFFFF'}}>
+            <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', backgroundColor: '#FFFFFF', fontFamily: 'arial'}}>
                 <Header score={score} correct={correct} total={total} feedback={feedback} />
             </div>
 
-            <div style={{ display: "flex", gap: "10px", justifyContent: "center", marginTop: "10px 0", backgroundColor: '#FFFFFF' }}>
+            <div style={{ display: "flex", gap: "10px", justifyContent: "center", marginTop: "10px 0", backgroundColor: '#FFFFFF', fontFamily: 'arial' }}>
                <div style={{ display: "flex", flexDirection: "row", alignItems: "center", gap: "10px" }}>
                <img
                     src={addIcon}
@@ -244,7 +244,8 @@ function Game() {
                 fontSize: '50px',
                 fontWeight: 'bold',
                 color: '#636363',
-                backgroundColor: '#FFFFFF'
+                backgroundColor: '#FFFFFF',
+                fontFamily: 'arial'
                 }}>
                 <p>{problem.term1} {problem.symbol} {problem.term2} = {userAnswer || "?"}</p>
             </div>
@@ -252,7 +253,7 @@ function Game() {
             <Answer onNumberClick={handleNumberClick} />
     
 
-            <div style={{ display: "flex", gap: "10px", justifyContent: "center", marginTop: "10px 0", backgroundColor: '#FFFFFF' }}>
+            <div style={{ display: "flex", gap: "10px", justifyContent: "center", marginTop: "10px 0", backgroundColor: '#FFFFFF', fontFamily: 'arial' }}>
                 <div style={{ display: "flex", flexDirection: "row", alignItems: "center", margin: "50px 0", gap: "10px" }}>
                     
                     <img
