@@ -15,6 +15,12 @@ import enterButton from "../assets/images/button_image_enter.png";
 import newButton from "../assets/images/button_image_new_problem.png";
 import resetButton from "../assets/images/button_image_reset_score.png";
 import deleteButton from "../assets/images/button_image_delete.png";
+import clickSound from "../assets/sounds/mouse-click-153941.mp3";
+import successSound from "../assets/sounds/short-success-sound-glockenspiel-treasure-video-game-6346.mp3";
+import errorSound from "../assets/sounds/error-11-352286.mp3";
+import newSound from "../assets/sounds/new-notification-09-352705.mp3";
+import resetSound from "../assets/sounds/bright-notification-352449.mp3";
+
 
 function Game() {
     console.log("Game.jsx component is loaded");
@@ -24,6 +30,17 @@ function Game() {
     const [correct, setCorrect] = useState(parseInt(localStorage.getItem("correct")) || 0);
     const [wrong, setWrong] = useState(parseInt(localStorage.getItem("wrong")) || 0);
     const [hasSubmitted, setHasSubmitted] = useState(false);
+
+    const clickAudio = new Audio(clickSound);
+    const successAudio = new Audio(successSound);
+    const errorAudio = new Audio(errorSound);
+    const newAudio = new Audio(newSound);
+    const resetAudio = new Audio(resetSound);
+    const playSound = (audio) => {
+        audio.currentTime = 0;
+        audio.play();
+    }
+
 
     
     const { problem: addProblem, generateNewProblem: newAddProblem } = useGameAdd();
@@ -46,11 +63,13 @@ function Game() {
     // 7. Add sound effects
 
     const handleNumberClick = (number) => {
+        playSound(clickAudio);
         setUserAnswer((prev) => (parseInt(prev || "0") * 10 + number).toString());
     }
 
     const handleDelete = () => {
         /* write code to delete answer. */
+        playSound(clickAudio);
         setUserAnswer((prev) => prev.slice(0,-1));
     }
 
@@ -59,14 +78,16 @@ function Game() {
 
         if (hasSubmitted) return; // prevent multiple submission
 
-        setHasSubmitted(true); // lock future submission
+        setHasSubmitted(true); // temporarily block future submission
 
         const isCorrect = parseFloat(userAnswer) === problem.solution;
+        setUserAnswer(""); //clear input for now
 
         setUserAnswer("");
 
         setTimeout(() => {
             if (isCorrect) {
+                playSound(successAudio);
                 setCorrect(prev => {
                     const newCorrect = prev + 1;
                     localStorage.setItem("correct", newCorrect);
@@ -84,10 +105,11 @@ function Game() {
                 setTimeout(() => {
                     generateNewProblem();
                     setUserAnswer("");
-                    setHasSubmitted(fasle); // reset for next problem
+                    setHasSubmitted(false); // allow new submission
                 }, 1500);
                 
             } else {
+                playSound(errorAudio);
                 setWrong(prev => {
                     const newWrong = prev + 1;
                     localStorage.setItem("wrong", newWrong);
@@ -101,12 +123,16 @@ function Game() {
                     pauseOnHover: false,
                     draggable: false,
                 });
+                
+                setTimeout(() => {
+                    setHasSubmitted(false);
+                }, 1000); // re-enable submit after short delay to allow retry
             }
-            setUserAnswer("");
         }, 500);
     };
 
     const handleNewProblem = () => {
+        playSound(newAudio);
         generateNewProblem();
         setFeedback(""); 
         setUserAnswer("");
@@ -114,6 +140,7 @@ function Game() {
     };
 
     const resetScore = () => {
+        playSound(resetAudio);
         setFeedback("");
         setUserAnswer("");
         setCorrect(0);
