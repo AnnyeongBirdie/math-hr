@@ -11,6 +11,8 @@ import addIcon from "../assets/images/addition_card.png";
 import subtractIcon from "../assets/images/subtraction_card.png";
 import multiplyIcon from "../assets/images/multiplication_card.png";
 import divideIcon from "../assets/images/division_card.png";
+import gearIcon from "../assets/images/icon_settings_gear.png";
+import ImageButton from "./ImageButton";
 import enterButton from "../assets/images/button_image_enter.png";
 import newButton from "../assets/images/button_image_new_problem.png";
 import resetButton from "../assets/images/button_image_reset_score.png";
@@ -21,6 +23,7 @@ import errorSound from "../assets/sounds/error-11-352286.mp3";
 import newSound from "../assets/sounds/new-notification-09-352705.mp3";
 import resetSound from "../assets/sounds/harp-flourish-6251.mp3";
 import switchSound from "../assets/sounds/noisy-switch-166327.mp3";
+import SettingsMenu from "./SettingsMenu";
 
 
 function Game() {
@@ -52,17 +55,6 @@ function Game() {
 
     const problem = operation === "+" ? addProblem : operation === "-" ? subtractProblem : operation === "×" ? multiplyProblem : divideProblem ;
     const generateNewProblem = operation === "+" ? newAddProblem : operation === "-" ? newSubtractProblem : operation === "×" ? newMultiplyProblem : newDivideProblem ;
-    
-    /* Task: Add new feature - Division  */
-    // 1. Create separate hook useGameDivide.js for lower elementary students (must be divisible without remainders, no decimals)
-    // 2. Edit consts problem and generateNewProblem to dynamically respond when operation === "×"
-    // 3. Edit consts problem and generateNewProblem to dynamically respond when operation === "÷" 
-
-    /* Task: Fix bugs */
-    // 4. a new problem should be generate when answer is submitted for substract and multiply problems (currently only works for add problems)
-    // 5. Fix toastify set timeout issue - new problem should follow toast only when the answer is correct
-    // 6. Create logic so that there is an option to edit answer before submitting
-    // 7. Add sound effects
 
     const handleNumberClick = (number) => {
         playSound(clickAudio);
@@ -160,77 +152,87 @@ function Game() {
     return (
         <div>
             
+            <br></br>
+            <br></br>
+
+           <SettingsMenu 
+                onNewProblem={handleNewProblem}
+                onResetScore={resetScore}
+                clickSound={clickSound}
+                gearIcon={gearIcon}
+            />
+
             <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', backgroundColor: '#FFFFFF', fontFamily: 'arial'}}>
                 <Header score={score} correct={correct} total={total} feedback={feedback} />
             </div>
 
             <div style={{ display: "flex", gap: "10px", justifyContent: "center", marginTop: "10px 0", backgroundColor: '#FFFFFF', fontFamily: 'arial' }}>
                <div style={{ display: "flex", flexDirection: "row", alignItems: "center", gap: "10px" }}>
-               <img
-                    src={addIcon}
-                    alt="Addition"
-                    onClick={() => {
-                        playSound(switchAudio);
-                        setOperation("+"); 
-                        setHasSubmitted(false);
-                    }}
-                    style={{ 
-                        cursor: "pointer", 
-                        width: "50px", 
-                        height: "75px",  
-                        border: operation === "+" ? "2px solid blue" : "none",
-                        borderRadius: "8px" 
-                    }}
+               
+               <ImageButton
+                src={addIcon}
+                alt="Addition"
+                onAction={() => {
+                    playSound(switchAudio);
+                    setOperation("+");
+                    setHasSubmitted(false);
+                }}
+                style={{
+                    width: "50px",
+                    height: "75px",
+                    border: operation === "+" ? "2px solid blue" : "none",
+                    borderRadius: "8px",
+                }}
                 />
-                <img
+
+                <ImageButton
                     src={subtractIcon}
                     alt="Subtraction"
-                    onClick={() => {
+                    onAction={() => {
                         playSound(switchAudio);
                         setOperation("-");
                         setHasSubmitted(false);
                     }}
-                    style={{ 
-                        ursor: "pointer", 
-                        width: "50px", 
-                        height: "75px", 
+                    style={{
+                        width: "50px",
+                        height: "75px",
                         border: operation === "-" ? "2px solid blue" : "none",
-                        borderRadius: "8px" 
+                        borderRadius: "8px",
                     }}
                 />
-                <img
+
+                <ImageButton
                     src={multiplyIcon}
                     alt="Multiplication"
-                    onClick={() => {
+                    onAction={() => {
                         playSound(switchAudio);
-                        setOperation("×"); 
+                        setOperation("×");
                         setHasSubmitted(false);
                     }}
-                    style={{ 
-                        cursor: "pointer", 
-                        width: "50px", 
+                    style={{
+                        width: "50px",
                         height: "75px",
                         border: operation === "×" ? "2px solid blue" : "none",
-                        borderRadius: "8px"  
+                        borderRadius: "8px",
                     }}
                 />
-                
-                <img
+
+                <ImageButton
                     src={divideIcon}
                     alt="Division"
-                    onClick={() => {
+                    onAction={() => {
                         playSound(switchAudio);
-                        setOperation("÷"); 
+                        setOperation("÷");
                         setHasSubmitted(false);
                     }}
-                    style={{ 
-                        cursor: "pointer", 
-                        width: "50px", 
+                    style={{
+                        width: "50px",
                         height: "75px",
                         border: operation === "÷" ? "2px solid blue" : "none",
-                        borderRadius: "8px"  
+                        borderRadius: "8px",
                     }}
                 />
+            
                </div>
                 
             </div>
@@ -256,50 +258,21 @@ function Game() {
             <div style={{ display: "flex", gap: "10px", justifyContent: "center", marginTop: "10px 0", backgroundColor: '#FFFFFF', fontFamily: 'arial' }}>
                 <div style={{ display: "flex", flexDirection: "row", alignItems: "center", margin: "50px 0", gap: "10px" }}>
                     
-                    <img
-                        src={deleteButton}
-                        alt="Delete"
-                        onClick={handleDelete}
-                        style={{ 
-                            cursor: "pointer", 
-                            width: "80px", 
-                            height: "50px" 
-                        }}
+                    <ImageButton
+                    src={deleteButton}
+                    alt="Delete"
+                    onAction={handleDelete}
+                    style={{ width: "80px", height: "50px" }}
                     />
 
                     
-                    <img
-                        src={enterButton}
-                        alt="Enter"
-                        onClick={handleSubmit}
-                        style={{ 
-                            cursor: "pointer", 
-                            width: "80px", 
-                            height: "50px" 
-                        }}
+                   <ImageButton
+                    src={enterButton}
+                    alt="Enter"
+                    onAction={handleSubmit}
+                    style={{ width: "80px", height: "50px" }}
                     />
 
-                    <img 
-                        src={newButton}
-                        alt="New Problem"
-                        onClick={handleNewProblem}
-                        style={{ 
-                            cursor: "pointer", 
-                            width: "80px", 
-                            height: "50px" 
-                        }}
-                    />
-                    
-                    <img
-                        src={resetButton}
-                        alt="Reset Score"
-                        onClick={resetScore}
-                        style={{ 
-                            cursor: "pointer", 
-                            width: "80px", 
-                            height: "50px" 
-                        }}
-                    />
                 </div>
                
             </div>
