@@ -89,7 +89,7 @@ function Game() {
                 });
                 toast.success("잘했어요! 🎉", {
                     position: "top-center",
-                    autoClose: 2000,
+                    autoClose: 1000,
                     hideProgressBar: true,
                     closeOnClick: true,
                     pauseOnHover: false,
@@ -111,7 +111,7 @@ function Game() {
                 });
                 toast.error("아쉽지만 틀렸어요. 다시해봐요! 🥴", {
                     position: "top-center",
-                    autoClose: 2000,
+                    autoClose: 1000,
                     hideProgressBar: true,
                     closeOnClick: true,
                     pauseOnHover: false,
