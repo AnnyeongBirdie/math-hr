@@ -54,24 +54,24 @@ function Game() {
         }
     }
 
-    // 🎯 NEW: Difficulty ranges mapping
+    // 🎯 UPDATED: Difficulty ranges mapping with allowNegative for subtraction
     const getDifficultyRanges = (difficulty) => {
         const ranges = {
             "쉬움": {
                 addition: { min: 1, max: 10 },
-                subtraction: { min: 1, max: 10 },
+                subtraction: { min: 1, max: 10, allowNegative: false },
                 multiplication: { min: 1, max: 5 },
                 division: { type: "easy" }
             },
             "보통": {
                 addition: { min: 1, max: 50 },
-                subtraction: { min: 1, max: 50 },
+                subtraction: { min: 1, max: 50, allowNegative: false },
                 multiplication: { min: 5, max: 10 },
                 division: { type: "medium" }
             },
             "어려움": {
                 addition: { min: 1, max: 100 },
-                subtraction: { min: 1, max: 100 },
+                subtraction: { min: 1, max: 100, allowNegative: true },
                 multiplication: { min: 7, max: 12 },
                 division: { type: "hard" }
             }
