@@ -13,6 +13,8 @@ function SettingsMenu({
   const [isOpen, setIsOpen] = useState(false);
   const [confirmReset, setConfirmReset] = useState(false);
   const lastTouchedRef = useRef(0);
+  const actionDebounceRef = useRef(0);
+  const lastEventTypeRef = useRef(null); // Track the last event type
 
   const playSound = () => {
     if (clickSound && isSoundOn) {
@@ -31,35 +33,136 @@ function SettingsMenu({
     return false;
   };
 
-  const toggleModal = () => {
+  // Enhanced debouncing with event type checking
+  const canPerformAction = (actionName = "unknown", eventType = "unknown") => {
+    const now = Date.now();
+    const timeSinceLastAction = now - actionDebounceRef.current;
+    
+    console.log(`🔍 Action: ${actionName}, EventType: ${eventType}, Time since last: ${timeSinceLastAction}ms`);
+    
+    // If it's the same event type within a short time, allow it
+    // If it's a different event type within a short time, block it (likely duplicate)
+    if (timeSinceLastAction < 100) {
+      if (lastEventTypeRef.current && lastEventTypeRef.current !== eventType) {
+        console.log(`❌ Action ${actionName} BLOCKED (different event type too soon: ${lastEventTypeRef.current} -> ${eventType})`);
+        return false;
+      }
+    }
+    
+    if (timeSinceLastAction > 300) {
+      actionDebounceRef.current = now;
+      lastEventTypeRef.current = eventType;
+      console.log(`✅ Action ${actionName} ALLOWED`);
+      return true;
+    }
+    
+    console.log(`❌ Action ${actionName} BLOCKED (too soon)`);
+    return false;
+  };
+
+  const toggleModal = (e) => {
+    const eventType = e.type;
+    if (eventType !== 'touchstart') {
+      e.preventDefault();
+    }
+    e.stopPropagation();
+    
     if (!canOpen()) return;
     playSound();
     setIsOpen(prev => !prev);
     setConfirmReset(false);
   };
 
-  const handleAction = (action) => {
+  const handleAction = (action, e, actionName = "generic") => {
+    const eventType = e.type;
+    
+    // Only preventDefault for mouse events, not touch events
+    if (eventType !== 'touchstart') {
+      e.preventDefault();
+    }
+    e.stopPropagation();
+    
+    if (!canPerformAction(actionName, eventType)) return;
+    
+    console.log(`🎯 Executing action: ${actionName}`);
     playSound();
     action();
     setIsOpen(false);
     setConfirmReset(false);
   };
 
-  const handleKeyDown = (e, action) => {
-    if (e.key === "Enter" || e.key === " ") {
+  const confirmResetAction = (e) => {
+    const eventType = e.type;
+    if (eventType !== 'touchstart') {
       e.preventDefault();
-      handleAction(action);
     }
-  };
-
-  const confirmResetAction = () => {
+    e.stopPropagation();
+    
+    if (!canPerformAction("confirmReset", eventType)) return;
+    
     playSound();
     setConfirmReset(true);
   };
 
-  const cancelReset = () => {
+  const cancelReset = (e) => {
+    const eventType = e.type;
+    if (eventType !== 'touchstart') {
+      e.preventDefault();
+    }
+    e.stopPropagation();
+    
+    if (!canPerformAction("cancelReset", eventType)) return;
+    
     playSound();
     setConfirmReset(false);
+  };
+
+  const handleDifficultyChange = (level, e) => {
+    const eventType = e.type;
+    if (eventType !== 'touchstart') {
+      e.preventDefault();
+    }
+    e.stopPropagation();
+    
+    if (!canPerformAction(`difficulty-${level}`, eventType)) return;
+    
+    playSound();
+    onChangeDifficulty(level);
+  };
+
+  const handleSoundToggle = (e) => {
+    const eventType = e.type;
+    if (eventType !== 'touchstart') {
+      e.preventDefault();
+    }
+    e.stopPropagation();
+    
+    if (!canPerformAction("soundToggle", eventType)) return;
+    
+    console.log(`🔊 Sound toggle clicked. Current state: ${isSoundOn}`);
+    playSound();
+    onToggleSound();
+    console.log(`🔊 Sound toggle after callback should be: ${!isSoundOn}`);
+  };
+
+  const handleCloseModal = (e) => {
+    const eventType = e.type;
+    if (eventType !== 'touchstart') {
+      e.preventDefault();
+    }
+    e.stopPropagation();
+    
+    if (!canPerformAction("closeModal", eventType)) return;
+    
+    playSound();
+    setIsOpen(false);
+    setConfirmReset(false);
+  };
+
+  const handleKeyDown = (e, callback) => {
+    if (e.key === "Enter" || e.key === " ") {
+      callback(e);
+    }
   };
 
   useEffect(() => {
@@ -88,7 +191,7 @@ function SettingsMenu({
   return (
     <>
       {/* Gear Icon */}
-      <div style={{ position: "absolute", top: "10px", left: "10px", zIndex: 1000 }}>
+      <div style={{ position: "absolute", top: "20px", left: "70px", zIndex: 1000 }}>
         <img
           src={gearIcon}
           alt="Settings"
@@ -96,12 +199,10 @@ function SettingsMenu({
           tabIndex="0"
           onMouseDown={toggleModal}
           onTouchStart={toggleModal}
-          onKeyDown={(e) =>
-            e.key === "Enter" || e.key === " " ? toggleModal() : null
-          }
+          onKeyDown={(e) => handleKeyDown(e, toggleModal)}
           style={{
-            width: "32px",
-            height: "32px",
+            width: "40px",
+            height: "40px",
             cursor: "pointer",
           }}
         />
@@ -135,6 +236,7 @@ function SettingsMenu({
               textAlign: "center",
               animation: "fadeIn 0.2s ease-in-out",
             }}
+            onClick={(e) => e.stopPropagation()}
           >
             <h3 style={{ marginTop: 0 }}>⚙️ 설정</h3>
 
@@ -142,9 +244,9 @@ function SettingsMenu({
             <div
               role="button"
               tabIndex="0"
-              onMouseDown={() => handleAction(onNewProblem)}
-              onTouchStart={() => handleAction(onNewProblem)}
-              onKeyDown={(e) => handleKeyDown(e, onNewProblem)}
+              onMouseDown={(e) => handleAction(onNewProblem, e, "newProblem")}
+              onTouchStart={(e) => handleAction(onNewProblem, e, "newProblem")}
+              onKeyDown={(e) => handleKeyDown(e, (e) => handleAction(onNewProblem, e, "newProblem"))}
               style={menuItemStyle()}
             >
               🔄 새 문제
@@ -153,10 +255,23 @@ function SettingsMenu({
             {/* Reset Score with Confirm */}
             {confirmReset ? (
               <>
-                <div style={{ marginTop: "10px", fontWeight: "bold" }}>정말로 점수를 초기화할까요?</div>
                 <div style={{ marginTop: "8px", display: "flex", justifyContent: "center", gap: "10px" }}>
-                  <button onClick={() => handleAction(onResetScore)} style={buttonStyle("danger")}>네</button>
-                  <button onClick={cancelReset} style={buttonStyle("cancel")}>아니요</button>
+                  <button 
+                    onMouseDown={(e) => handleAction(onResetScore, e, "resetScore")} 
+                    onTouchStart={(e) => handleAction(onResetScore, e, "resetScore")}
+                    onKeyDown={(e) => handleKeyDown(e, (e) => handleAction(onResetScore, e, "resetScore"))}
+                    style={buttonStyle("danger")}
+                  >
+                    네
+                  </button>
+                  <button 
+                    onMouseDown={cancelReset} 
+                    onTouchStart={cancelReset}
+                    onKeyDown={(e) => handleKeyDown(e, cancelReset)}
+                    style={buttonStyle("cancel")}
+                  >
+                    아니요
+                  </button>
                 </div>
               </>
             ) : (
@@ -176,9 +291,9 @@ function SettingsMenu({
             <div
               role="button"
               tabIndex="0"
-              onMouseDown={() => handleAction(onToggleSound)}
-              onTouchStart={() => handleAction(onToggleSound)}
-              onKeyDown={(e) => handleKeyDown(e, onToggleSound)}
+              onMouseDown={handleSoundToggle}
+              onTouchStart={handleSoundToggle}
+              onKeyDown={(e) => handleKeyDown(e, handleSoundToggle)}
               style={menuItemStyle()}
             >
               🔊 소리 {isSoundOn ? "끄기" : "켜기"}
@@ -191,10 +306,14 @@ function SettingsMenu({
                 {["쉬움", "보통", "어려움"].map((level) => (
                   <button
                     key={level}
-                    onClick={() => handleAction(() => onChangeDifficulty(level))}
+                    onMouseDown={(e) => handleDifficultyChange(level, e)}
+                    onTouchStart={(e) => handleDifficultyChange(level, e)}
+                    onKeyDown={(e) => handleKeyDown(e, (e) => handleDifficultyChange(level, e))}
                     style={{
                       ...buttonStyle("neutral"),
                       backgroundColor: currentDifficulty === level ? "#a3d9a5" : "#f0f0f0",
+                      border: currentDifficulty === level ? "2px solid #27ae60" : "1px solid #ddd",
+                      fontWeight: currentDifficulty === level ? "bold" : "normal",
                     }}
                   >
                     {level}
@@ -205,11 +324,9 @@ function SettingsMenu({
 
             {/* Close Button */}
             <button
-              onClick={() => {
-                playSound();
-                setIsOpen(false);
-                setConfirmReset(false);
-              }}
+              onMouseDown={handleCloseModal}
+              onTouchStart={handleCloseModal}
+              onKeyDown={(e) => handleKeyDown(e, handleCloseModal)}
               style={{ marginTop: "20px", ...buttonStyle("cancel") }}
             >
               닫기
@@ -246,7 +363,7 @@ const buttonStyle = (type = "neutral") => {
   return {
     padding: "6px 12px",
     borderRadius: "6px",
-    border: "none",
+    border: "1px solid #ddd",
     backgroundColor: colors[type],
     cursor: "pointer",
   };
