@@ -26,17 +26,20 @@ import resetSound from "../assets/sounds/harp-flourish-6251.mp3";
 import switchSound from "../assets/sounds/back-tick-107822.mp3";
 import SettingsMenu from "./SettingsMenu";
 import AboutMenu from "./AboutMenu";
+import DifficultyBadge from "./DifficultyBadge";
 
 function Game() {
     console.log("Game.jsx component is loaded");
+    // State
     const [operation, setOperation] = useState("+");
     const [userAnswer, setUserAnswer] = useState("");
     const [feedback, setFeedback] = useState("");
     const [correct, setCorrect] = useState(parseInt(localStorage.getItem("correct")) || 0);
     const [wrong, setWrong] = useState(parseInt(localStorage.getItem("wrong")) || 0);
     const [hasSubmitted, setHasSubmitted] = useState(false);
-    
-    // 🎯 NEW: Difficulty and sound state
+    const [inputLimitReached, setInputLimitReached] = useState(false);
+
+    // Difficulty and sound state
     const [difficulty, setDifficulty] = useState(localStorage.getItem("difficulty") || "쉬움");
     const [isSoundOn, setIsSoundOn] = useState(localStorage.getItem("soundEnabled") !== "false");
 
@@ -53,6 +56,16 @@ function Game() {
             audio.play();
         }
     }
+
+const getResponsiveFontSize = (text) => {
+    const length = text.length;
+    if (length <= 5) return '72px';   // Increased from 50px
+    if (length <= 8) return '58px';   // Increased from 40px
+    if (length <= 10) return '48px';  // Increased from 32px
+    if (length <= 12) return '42px';  // New tier
+    if (length <= 15) return '36px';  // New tier
+    return '32px';                    // Increased from 26px
+};
 
     // 🎯 UPDATED: Difficulty ranges mapping with allowNegative for subtraction
     const getDifficultyRanges = (difficulty) => {
@@ -91,51 +104,66 @@ function Game() {
     const generateNewProblem = operation === "+" ? newAddProblem : operation === "-" ? newSubtractProblem : operation === "×" ? newMultiplyProblem : newDivideProblem ;
 
     // 🎯 UPDATED: Enhanced number click handler for decimal and negative support
-    const handleNumberClick = (value) => {
-        playSound(clickAudio);
-        
-        // Handle numeric input
-        if (typeof value === 'number') {
-            setUserAnswer((prev) => {
-                // If the current answer is "0" or empty, replace it with the new number
-                if (prev === "" || prev === "0") {
-                    return value.toString();
-                }
-                // Otherwise, append the digit
-                return prev + value.toString();
-            });
-        }
-        // Handle decimal point
-        else if (value === ".") {
-            setUserAnswer((prev) => {
-                // Don't allow multiple decimal points
-                if (prev.includes(".")) {
-                    return prev;
-                }
-                // If empty or just a negative sign, add "0."
-                if (prev === "" || prev === "-") {
-                    return prev + "0.";
-                }
-                // Otherwise, just add the decimal point
-                return prev + ".";
-            });
-        }
-        // Handle negative sign
-        else if (value === "-") {
-            setUserAnswer((prev) => {
-                // If already negative, remove the negative sign
-                if (prev.startsWith("-")) {
-                    return prev.substring(1);
-                }
-                // If empty, just add the negative sign
-                if (prev === "") {
-                    return "-";
-                }
-                // Otherwise, add negative sign to the beginning
-                return "-" + prev;
-            });
-        }
+   const handleNumberClick = (value) => {
+    playSound(clickAudio);
+    
+    // Handle numeric input
+    if (typeof value === 'number') {
+        setUserAnswer((prev) => {
+            // Check if we're at the limit
+            if (prev.length >= 8) {
+                // Show visual feedback that limit is reached
+                setInputLimitReached(true);
+                setTimeout(() => setInputLimitReached(false), 300);
+                return prev;
+            }
+            
+            // If the current answer is "0" or empty, replace it with the new number
+            if (prev === "" || prev === "0") {
+                return value.toString();
+            }
+            // Otherwise, append the digit
+            return prev + value.toString();
+        });
     }
+    // Handle decimal point
+    else if (value === ".") {
+        setUserAnswer((prev) => {
+            // Check limit
+            if (prev.length >= 8) {
+                setInputLimitReached(true);
+                setTimeout(() => setInputLimitReached(false), 300);
+                return prev;
+            }
+            
+            // Don't allow multiple decimal points
+            if (prev.includes(".")) {
+                return prev;
+            }
+            // If empty or just a negative sign, add "0."
+            if (prev === "" || prev === "-") {
+                return prev + "0.";
+            }
+            // Otherwise, just add the decimal point
+            return prev + ".";
+        });
+    }
+    // Handle negative sign (doesn't count toward character limit)
+    else if (value === "-") {
+        setUserAnswer((prev) => {
+            // If already negative, remove the negative sign
+            if (prev.startsWith("-")) {
+                return prev.substring(1);
+            }
+            // If empty, just add the negative sign
+            if (prev === "") {
+                return "-";
+            }
+            // Otherwise, add negative sign to the beginning
+            return "-" + prev;
+        });
+    }
+};
 
     const handleDelete = () => {
         playSound(clickAudio);
@@ -229,16 +257,49 @@ function Game() {
     };
 
     // 🎯 NEW: Difficulty change handler
-    const handleChangeDifficulty = (newDifficulty) => {
-        setDifficulty(newDifficulty);
-        localStorage.setItem("difficulty", newDifficulty);
-        // Generate new problem with new difficulty
-        setTimeout(() => {
-            generateNewProblem();
-            setUserAnswer("");
-            setHasSubmitted(false);
-        }, 100);
+// Update the handleChangeDifficulty function to use toast ID
+const handleChangeDifficulty = (newDifficulty) => {
+    // Don't change if it's already the current difficulty
+    if (newDifficulty === difficulty) {
+        return;
+    }
+    
+    const getDifficultyConfig = (difficulty) => {
+        switch (difficulty) {
+            case "쉬움":
+                return { emoji: "🌱", text: "쉬움 모드" };
+            case "보통":
+                return { emoji: "⚡", text: "보통 모드" };
+            case "어려움":
+                return { emoji: "🔥", text: "어려움 모드" };
+            default:
+                return { emoji: "🌱", text: "쉬움 모드" };
+        }
     };
+
+    const config = getDifficultyConfig(newDifficulty);
+    
+    // Use toast ID to prevent duplicates
+    toast.info(`${config.emoji} ${config.text}로 변경되었습니다!`, {
+        toastId: `difficulty-${newDifficulty}`, // This prevents duplicate toasts
+        position: "top-center",
+        autoClose: 2000,
+        hideProgressBar: true,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: false,
+    });
+
+    setDifficulty(newDifficulty);
+    localStorage.setItem("difficulty", newDifficulty);
+    
+    // Generate new problem with new difficulty
+    setTimeout(() => {
+        generateNewProblem();
+        setUserAnswer("");
+        setHasSubmitted(false);
+    }, 100);
+};
 
 // 🎯 FIXED: Sound toggle handler with functional update
 const handleToggleSound = () => {
@@ -284,6 +345,8 @@ const handleToggleSound = () => {
             <AboutMenu 
                 aboutIcon={aboutIcon}
             />
+
+             <DifficultyBadge difficulty={difficulty} />
 
             <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', backgroundColor: '#FFFFFF', fontFamily: 'arial'}}>
                 <Header score={score} correct={correct} total={total} feedback={feedback} />
@@ -360,19 +423,25 @@ const handleToggleSound = () => {
                 
             </div>
 
-            <div 
-            style={{ 
-                display: 'flex', 
-                flexDirection: 'column', 
-                justifyContent: 'center', 
-                alignItems: 'center',
-                fontSize: '50px',
-                fontWeight: 'bold',
-                color: '#636363',
-                backgroundColor: '#FFFFFF',
-                fontFamily: 'arial'
+           <div 
+                style={{ 
+                    display: 'flex', 
+                    flexDirection: 'column', 
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    fontSize: getResponsiveFontSize(`${problem.term1} ${problem.symbol} ${problem.term2} = ${userAnswer || "?"}`),
+                    fontWeight: 'bold',
+                    color: inputLimitReached ? '#e74c3c' : '#636363', // Red when limit reached
+                    backgroundColor: '#FFFFFF',
+                    fontFamily: 'arial',
+                    padding: '10px',
+                    maxWidth: '90vw',
+                    transition: 'color 0.3s ease', // Smooth color transition
+                    transform: inputLimitReached ? 'scale(1.02)' : 'scale(1)', // Slight scale effect
                 }}>
-                <p>{problem.term1} {problem.symbol} {problem.term2} = {userAnswer || "?"}</p>
+                <p style={{ margin: '0', textAlign: 'center' }}>
+                    {problem.term1} {problem.symbol} {problem.term2} = {userAnswer || "?"}
+                </p>
             </div>
 
             <Answer onNumberClick={handleNumberClick} />
