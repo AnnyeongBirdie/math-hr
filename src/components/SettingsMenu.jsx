@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, {useEffect, useRef, useState} from "react";
 
 function SettingsMenu({
   onNewProblem,
@@ -32,7 +32,12 @@ function SettingsMenu({
     }
     return false;
   };
-
+  function handleEventCommon(e) {
+    if (e.type !== 'touchstart') {
+      e.preventDefault();
+    }
+    e.stopPropagation();
+  }
   // Enhanced debouncing with event type checking
   const canPerformAction = (actionName = "unknown", eventType = "unknown") => {
     const now = Date.now();
@@ -60,13 +65,9 @@ function SettingsMenu({
     return false;
   };
 
-  const toggleModal = (e) => {
-    const eventType = e.type;
-    if (eventType !== 'touchstart') {
-      e.preventDefault();
-    }
-    e.stopPropagation();
-    
+   const toggleModal = (e) => {
+    handleEventCommon(e);
+
     if (!canOpen()) return;
     playSound();
     setIsOpen(prev => !prev);
@@ -74,15 +75,9 @@ function SettingsMenu({
   };
 
   const handleAction = (action, e, actionName = "generic") => {
-    const eventType = e.type;
-    
     // Only preventDefault for mouse events, not touch events
-    if (eventType !== 'touchstart') {
-      e.preventDefault();
-    }
-    e.stopPropagation();
-    
-    if (!canPerformAction(actionName, eventType)) return;
+    handleEventCommon(e);
+    if (!canPerformAction(actionName, e.type)) return;
     
     console.log(`🎯 Executing action: ${actionName}`);
     playSound();
@@ -92,52 +87,32 @@ function SettingsMenu({
   };
 
   const confirmResetAction = (e) => {
-    const eventType = e.type;
-    if (eventType !== 'touchstart') {
-      e.preventDefault();
-    }
-    e.stopPropagation();
-    
-    if (!canPerformAction("confirmReset", eventType)) return;
+    handleEventCommon(e);
+    if (!canPerformAction("confirmReset", e.type)) return;
     
     playSound();
     setConfirmReset(true);
   };
 
   const cancelReset = (e) => {
-    const eventType = e.type;
-    if (eventType !== 'touchstart') {
-      e.preventDefault();
-    }
-    e.stopPropagation();
-    
-    if (!canPerformAction("cancelReset", eventType)) return;
+    handleEventCommon(e);
+    if (!canPerformAction("cancelReset", e.type)) return;
     
     playSound();
     setConfirmReset(false);
   };
 
   const handleDifficultyChange = (level, e) => {
-    const eventType = e.type;
-    if (eventType !== 'touchstart') {
-      e.preventDefault();
-    }
-    e.stopPropagation();
-    
-    if (!canPerformAction(`difficulty-${level}`, eventType)) return;
+    handleEventCommon(e);
+    if (!canPerformAction(`difficulty-${level}`, e.type)) return;
     
     playSound();
     onChangeDifficulty(level);
   };
 
   const handleSoundToggle = (e) => {
-    const eventType = e.type;
-    if (eventType !== 'touchstart') {
-      e.preventDefault();
-    }
-    e.stopPropagation();
-    
-    if (!canPerformAction("soundToggle", eventType)) return;
+    handleEventCommon(e);
+    if (!canPerformAction("soundToggle", e.type)) return;
     
     console.log(`🔊 Sound toggle clicked. Current state: ${isSoundOn}`);
     playSound();
@@ -146,13 +121,8 @@ function SettingsMenu({
   };
 
   const handleCloseModal = (e) => {
-    const eventType = e.type;
-    if (eventType !== 'touchstart') {
-      e.preventDefault();
-    }
-    e.stopPropagation();
-    
-    if (!canPerformAction("closeModal", eventType)) return;
+    handleEventCommon(e);
+    if (!canPerformAction("closeModal", e.type)) return;
     
     playSound();
     setIsOpen(false);
