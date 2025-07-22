@@ -3,7 +3,7 @@ import React, {useEffect, useRef, useState} from "react";
 function SettingsMenu({
   onNewProblem,
   onResetScore,
-  clickSound,
+  playClick,
   gearIcon,
   onChangeDifficulty,
   onToggleSound,
@@ -15,14 +15,6 @@ function SettingsMenu({
   const lastTouchedRef = useRef(0);
   const actionDebounceRef = useRef(0);
   const lastEventTypeRef = useRef(null); // Track the last event type
-
-  const playSound = () => {
-    if (clickSound && isSoundOn) {
-      const audio = new Audio(clickSound);
-      audio.currentTime = 0;
-      audio.play();
-    }
-  };
 
   const canOpen = () => {
     const now = Date.now();
@@ -69,7 +61,7 @@ function SettingsMenu({
     handleEventCommon(e);
 
     if (!canOpen()) return;
-    playSound();
+    playClick();
     setIsOpen(prev => !prev);
     setConfirmReset(false);
   };
@@ -80,7 +72,7 @@ function SettingsMenu({
     if (!canPerformAction(actionName, e.type)) return;
     
     console.log(`🎯 Executing action: ${actionName}`);
-    playSound();
+    playClick();
     action();
     setIsOpen(false);
     setConfirmReset(false);
@@ -90,7 +82,7 @@ function SettingsMenu({
     handleEventCommon(e);
     if (!canPerformAction("confirmReset", e.type)) return;
     
-    playSound();
+    playClick();
     setConfirmReset(true);
   };
 
@@ -98,7 +90,7 @@ function SettingsMenu({
     handleEventCommon(e);
     if (!canPerformAction("cancelReset", e.type)) return;
     
-    playSound();
+    playClick();
     setConfirmReset(false);
   };
 
@@ -106,7 +98,7 @@ function SettingsMenu({
     handleEventCommon(e);
     if (!canPerformAction(`difficulty-${level}`, e.type)) return;
     
-    playSound();
+    playClick();
     onChangeDifficulty(level);
   };
 
@@ -115,7 +107,7 @@ function SettingsMenu({
     if (!canPerformAction("soundToggle", e.type)) return;
     
     console.log(`🔊 Sound toggle clicked. Current state: ${isSoundOn}`);
-    playSound();
+    playClick();
     onToggleSound();
     console.log(`🔊 Sound toggle after callback should be: ${!isSoundOn}`);
   };
@@ -124,7 +116,7 @@ function SettingsMenu({
     handleEventCommon(e);
     if (!canPerformAction("closeModal", e.type)) return;
     
-    playSound();
+    playClick();
     setIsOpen(false);
     setConfirmReset(false);
   };

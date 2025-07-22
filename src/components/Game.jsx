@@ -18,12 +18,7 @@ import enterButton from "../assets/images/button_image_enter.png";
 import newButton from "../assets/images/button_image_new_problem.png";
 import resetButton from "../assets/images/button_image_reset_score.png";
 import deleteButton from "../assets/images/button_image_delete.png";
-import clickSound from "../assets/sounds/tap-notification-180637.mp3";
-import successSound from "../assets/sounds/short-success-sound-glockenspiel-treasure-video-game-6346.mp3";
-import errorSound from "../assets/sounds/error-11-352286.mp3";
-import newSound from "../assets/sounds/new-notification-09-352705.mp3";
-import resetSound from "../assets/sounds/harp-flourish-6251.mp3";
-import switchSound from "../assets/sounds/back-tick-107822.mp3";
+import { useGameSounds } from "../hooks/useGameSound";
 import SettingsMenu from "./SettingsMenu";
 import AboutMenu from "./AboutMenu";
 import DifficultyBadge from "./DifficultyBadge";
@@ -41,21 +36,17 @@ function Game() {
 
     // Difficulty and sound state
     const [difficulty, setDifficulty] = useState(localStorage.getItem("difficulty") || "쉬움");
-    const [isSoundOn, setIsSoundOn] = useState(localStorage.getItem("soundEnabled") !== "false");
 
-    const clickAudio = new Audio(clickSound);
-    const successAudio = new Audio(successSound);
-    const errorAudio = new Audio(errorSound);
-    const newAudio = new Audio(newSound);
-    const resetAudio = new Audio(resetSound);
-    const switchAudio = new Audio(switchSound);
-    
-    const playSound = (audio) => {
-        if (isSoundOn) {
-            audio.currentTime = 0;
-            audio.play();
-        }
-    }
+    const {
+        isSoundOn,
+        handleToggleSound,
+        playClick,
+        playSuccess,
+        playError,
+        playNew,
+        playReset,
+        playSwitch,
+    } = useGameSounds();
 
 const getResponsiveFontSize = (text) => {
     const length = text.length;
@@ -105,7 +96,7 @@ const getResponsiveFontSize = (text) => {
 
     // 🎯 UPDATED: Enhanced number click handler for decimal and negative support
    const handleNumberClick = (value) => {
-    playSound(clickAudio);
+       playClick();
     
     // Handle numeric input
     if (typeof value === 'number') {
@@ -166,7 +157,7 @@ const getResponsiveFontSize = (text) => {
 };
 
     const handleDelete = () => {
-        playSound(clickAudio);
+        playClick();
         setUserAnswer((prev) => prev.slice(0,-1));
     }
 
@@ -195,7 +186,7 @@ const getResponsiveFontSize = (text) => {
 
         setTimeout(() => {
             if (isCorrect) {
-                playSound(successAudio);
+                playSuccess();
                 setCorrect(prev => {
                     const newCorrect = prev + 1;
                     localStorage.setItem("correct", newCorrect);
@@ -216,7 +207,7 @@ const getResponsiveFontSize = (text) => {
                 }, 1500);
                 
             } else {
-                playSound(errorAudio);
+                playError();
                 setWrong(prev => {
                     const newWrong = prev + 1;
                     localStorage.setItem("wrong", newWrong);
@@ -239,7 +230,7 @@ const getResponsiveFontSize = (text) => {
     };
 
     const handleNewProblem = () => {
-        playSound(newAudio);
+        playNew();
         generateNewProblem();
         setFeedback(""); 
         setUserAnswer("");
@@ -247,7 +238,7 @@ const getResponsiveFontSize = (text) => {
     };
 
     const resetScore = () => {
-        playSound(resetAudio);
+        playReset();
         setFeedback("");
         setUserAnswer("");
         setCorrect(0);
@@ -301,26 +292,6 @@ const handleChangeDifficulty = (newDifficulty) => {
     }, 100);
 };
 
-// 🎯 FIXED: Sound toggle handler with functional update
-const handleToggleSound = () => {
-    console.log(`🔊 handleToggleSound called. Current isSoundOn: ${isSoundOn}`);
-    
-    setIsSoundOn(prevState => {
-        const newSoundState = !prevState;
-        console.log(`🔊 Setting sound from ${prevState} to ${newSoundState}`);
-        localStorage.setItem("soundEnabled", newSoundState.toString());
-        
-        // Play test sound when enabling (use prevState to avoid race condition)
-        if (newSoundState) {
-            const testAudio = new Audio(clickSound);
-            testAudio.currentTime = 0;
-            testAudio.play();
-        }
-        
-        return newSoundState;
-    });
-};
-
     const total = correct + wrong;
     const score = total > 0 ? Math.round((correct / total) * 100) : 0;
 
@@ -334,7 +305,7 @@ const handleToggleSound = () => {
            <SettingsMenu 
                 onNewProblem={handleNewProblem}
                 onResetScore={resetScore}
-                clickSound={clickSound}
+                playClick={playClick}
                 gearIcon={gearIcon}
                 onChangeDifficulty={handleChangeDifficulty}
                 onToggleSound={handleToggleSound}
@@ -359,7 +330,7 @@ const handleToggleSound = () => {
                 src={addIcon}
                 alt="Addition"
                 onAction={() => {
-                    playSound(switchAudio);
+                    playSwitch();
                     setOperation("+");
                     setHasSubmitted(false);
                 }}
@@ -375,7 +346,7 @@ const handleToggleSound = () => {
                     src={subtractIcon}
                     alt="Subtraction"
                     onAction={() => {
-                        playSound(switchAudio);
+                        playSwitch();
                         setOperation("-");
                         setHasSubmitted(false);
                     }}
@@ -391,7 +362,7 @@ const handleToggleSound = () => {
                     src={multiplyIcon}
                     alt="Multiplication"
                     onAction={() => {
-                        playSound(switchAudio);
+                        playSwitch();
                         setOperation("×");
                         setHasSubmitted(false);
                     }}
@@ -407,7 +378,7 @@ const handleToggleSound = () => {
                     src={divideIcon}
                     alt="Division"
                     onAction={() => {
-                        playSound(switchAudio);
+                        playSwitch();
                         setOperation("÷");
                         setHasSubmitted(false);
                     }}
