@@ -12,113 +12,78 @@ function SettingsMenu({
 }) {
   const [isOpen, setIsOpen] = useState(false);
   const [confirmReset, setConfirmReset] = useState(false);
-  const lastTouchedRef = useRef(0);
-  const actionDebounceRef = useRef(0);
-  const lastEventTypeRef = useRef(null); // Track the last event type
 
-  const canOpen = () => {
-    const now = Date.now();
-    if (now - lastTouchedRef.current > 400) {
-      lastTouchedRef.current = now;
-      return true;
-    }
-    return false;
-  };
-  function handleEventCommon(e) {
+  function handleEventCommon(e,run) {
     if (e.type !== 'touchstart') {
       e.preventDefault();
     }
     e.stopPropagation();
+    if (!canPerformAction()) return false;
+    playClick();
+    run();
   }
-  // Enhanced debouncing with event type checking
-  const canPerformAction = (actionName = "unknown", eventType = "unknown") => {
+  const lastActionTimeRef = useRef(0);
+
+  const canPerformAction = () => {
     const now = Date.now();
-    const timeSinceLastAction = now - actionDebounceRef.current;
-    
-    console.log(`🔍 Action: ${actionName}, EventType: ${eventType}, Time since last: ${timeSinceLastAction}ms`);
-    
-    // If it's the same event type within a short time, allow it
-    // If it's a different event type within a short time, block it (likely duplicate)
-    if (timeSinceLastAction < 100) {
-      if (lastEventTypeRef.current && lastEventTypeRef.current !== eventType) {
-        console.log(`❌ Action ${actionName} BLOCKED (different event type too soon: ${lastEventTypeRef.current} -> ${eventType})`);
-        return false;
-      }
+    const delta = now - lastActionTimeRef.current;
+    if (delta < 500) {
+      console.log(`❌ BLOCKED (too fast: ${delta}ms)`);
+      return false;
     }
-    
-    if (timeSinceLastAction > 300) {
-      actionDebounceRef.current = now;
-      lastEventTypeRef.current = eventType;
-      console.log(`✅ Action ${actionName} ALLOWED`);
-      return true;
-    }
-    
-    console.log(`❌ Action ${actionName} BLOCKED (too soon)`);
-    return false;
+    lastActionTimeRef.current = now;
+    console.log(`✅ ALLOWED`);
+    return true;
   };
 
    const toggleModal = (e) => {
-    handleEventCommon(e);
-
-    if (!canOpen()) return;
-    playClick();
-    setIsOpen(prev => !prev);
-    setConfirmReset(false);
+    handleEventCommon(e,()=>{
+      setIsOpen(prev => !prev);
+      setConfirmReset(false);
+    });
   };
 
   const handleAction = (action, e, actionName = "generic") => {
     // Only preventDefault for mouse events, not touch events
-    handleEventCommon(e);
-    if (!canPerformAction(actionName, e.type)) return;
-    
-    console.log(`🎯 Executing action: ${actionName}`);
-    playClick();
-    action();
-    setIsOpen(false);
-    setConfirmReset(false);
+    handleEventCommon(e,()=> {
+      console.log(`🎯 Executing action: ${actionName}`);
+      action();
+      setIsOpen(false);
+      setConfirmReset(false);
+    });
   };
 
   const confirmResetAction = (e) => {
-    handleEventCommon(e);
-    if (!canPerformAction("confirmReset", e.type)) return;
-    
-    playClick();
-    setConfirmReset(true);
+    handleEventCommon(e,()=> {
+      setConfirmReset(true);
+    });
   };
 
   const cancelReset = (e) => {
-    handleEventCommon(e);
-    if (!canPerformAction("cancelReset", e.type)) return;
-    
-    playClick();
-    setConfirmReset(false);
+    handleEventCommon(e,()=> {
+      setConfirmReset(false);
+    });
   };
 
   const handleDifficultyChange = (level, e) => {
-    handleEventCommon(e);
-    if (!canPerformAction(`difficulty-${level}`, e.type)) return;
-    
-    playClick();
-    onChangeDifficulty(level);
+    handleEventCommon(e,()=> {
+      onChangeDifficulty(level);
+    });
   };
 
   const handleSoundToggle = (e) => {
-    handleEventCommon(e);
-    if (!canPerformAction("soundToggle", e.type)) return;
-    
-    console.log(`🔊 Sound toggle clicked. Current state: ${isSoundOn}`);
-    playClick();
-    onToggleSound();
-    console.log(`🔊 Sound toggle after callback should be: ${!isSoundOn}`);
+    handleEventCommon(e,()=> {
+      console.log(`🔊 Sound toggle clicked. Current state: ${isSoundOn}`);
+      onToggleSound();
+      console.log(`🔊 Sound toggle after callback should be: ${!isSoundOn}`);
+    });
   };
 
   const handleCloseModal = (e) => {
-    handleEventCommon(e);
-    if (!canPerformAction("closeModal", e.type)) return;
-    
-    playClick();
-    setIsOpen(false);
-    setConfirmReset(false);
+    handleEventCommon(e,()=> {
+      setIsOpen(false);
+      setConfirmReset(false);
+    });
   };
 
   const handleKeyDown = (e, callback) => {
@@ -218,16 +183,16 @@ function SettingsMenu({
             {confirmReset ? (
               <>
                 <div style={{ marginTop: "8px", display: "flex", justifyContent: "center", gap: "10px" }}>
-                  <button 
-                    onMouseDown={(e) => handleAction(onResetScore, e, "resetScore")} 
+                  <button
+                    onMouseDown={(e) => handleAction(onResetScore, e, "resetScore")}
                     onTouchStart={(e) => handleAction(onResetScore, e, "resetScore")}
                     onKeyDown={(e) => handleKeyDown(e, (e) => handleAction(onResetScore, e, "resetScore"))}
                     style={buttonStyle("danger")}
                   >
                     네
                   </button>
-                  <button 
-                    onMouseDown={cancelReset} 
+                  <button
+                    onMouseDown={cancelReset}
                     onTouchStart={cancelReset}
                     onKeyDown={(e) => handleKeyDown(e, cancelReset)}
                     style={buttonStyle("cancel")}
