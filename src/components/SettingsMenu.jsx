@@ -28,11 +28,9 @@ function SettingsMenu({
     const now = Date.now();
     const delta = now - lastActionTimeRef.current;
     if (delta < 500) {
-      console.log(`❌ BLOCKED (too fast: ${delta}ms)`);
       return false;
     }
     lastActionTimeRef.current = now;
-    console.log(`✅ ALLOWED`);
     return true;
   };
 
@@ -46,7 +44,6 @@ function SettingsMenu({
   const handleAction = (action, e, actionName = "generic") => {
     // Only preventDefault for mouse events, not touch events
     handleEventCommon(e,()=> {
-      console.log(`🎯 Executing action: ${actionName}`);
       action();
       setIsOpen(false);
       setConfirmReset(false);
@@ -73,9 +70,7 @@ function SettingsMenu({
 
   const handleSoundToggle = (e) => {
     handleEventCommon(e,()=> {
-      console.log(`🔊 Sound toggle clicked. Current state: ${isSoundOn}`);
       onToggleSound();
-      console.log(`🔊 Sound toggle after callback should be: ${!isSoundOn}`);
     });
   };
 
