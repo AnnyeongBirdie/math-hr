@@ -296,7 +296,14 @@ const handleChangeDifficulty = (newDifficulty) => {
     const score = total > 0 ? Math.round((correct / total) * 100) : 0;
 
     return (
-        <div>
+        <div
+            style={{
+                userSelect: "none",
+                WebkitUserSelect: "none",
+                msUserSelect: "none",
+                WebkitUserDrag: "none"
+            }}
+        >
             <br></br>
             <br></br>
             <br></br>

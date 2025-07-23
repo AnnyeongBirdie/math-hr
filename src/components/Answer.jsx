@@ -39,6 +39,7 @@ function Answer({ onNumberClick }) {
             <img
               src={src}
               alt={`Number ${i}`}
+              draggable="false"
               onClick={() => onNumberClick(i)}
               style={{ width: "50px", height: "75px", cursor: "pointer" }}
             />
@@ -52,6 +53,7 @@ function Answer({ onNumberClick }) {
             key={`special-${i}`}
             src={card.src}
             alt={card.alt}
+            draggable="false"
             onClick={() => handleSpecialClick(card.value)}
             style={{ width: "50px", height: "75px", cursor: "pointer" }}
           />

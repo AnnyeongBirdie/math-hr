@@ -96,6 +96,7 @@ function SettingsMenu({
           alt="Settings"
           role="button"
           tabIndex="0"
+          draggable="false"
           onMouseDown={toggleModal}
           onTouchStart={toggleModal}
           onKeyDown={(e) => handleKeyDown(e, toggleModal)}
