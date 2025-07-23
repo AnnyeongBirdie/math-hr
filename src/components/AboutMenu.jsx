@@ -31,7 +31,8 @@ function AboutMenu({ aboutIcon }) {
                 >
                     <img 
                         src={aboutIcon} 
-                        alt="About" 
+                        alt="About"
+                        draggable="false"
                         style={{ 
                             width: '40px', 
                             height: '40px',
