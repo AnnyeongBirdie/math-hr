@@ -410,7 +410,7 @@ const handleChangeDifficulty = (newDifficulty) => {
                     transition: 'color 0.3s ease', // Smooth color transition
                     transform: inputLimitReached ? 'scale(1.02)' : 'scale(1)', // Slight scale effect
                 }}>
-                <p style={{ margin: '0', textAlign: 'center' }}>
+                <p style={{ margin: '0', textAlign: 'center' , height:'60px'}}>
                     {problem.term1} {problem.symbol} {problem.term2} = {userAnswer || "?"}
                 </p>
             </div>
