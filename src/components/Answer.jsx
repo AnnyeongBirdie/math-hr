@@ -40,7 +40,7 @@ function Answer({ onNumberClick }) {
               src={src}
               alt={`Number ${i}`}
               draggable="false"
-              onClick={() => onNumberClick(i)}
+              onMouseDown={() => onNumberClick(i)}
               style={{ width: "50px", height: "75px", cursor: "pointer" }}
             />
             {i === 5 && <div style={{ flexBasis: "100%", height: "0" }} />} {/* line break after the 6th image (index 5) */}
@@ -54,7 +54,7 @@ function Answer({ onNumberClick }) {
             src={card.src}
             alt={card.alt}
             draggable="false"
-            onClick={() => handleSpecialClick(card.value)}
+            onMouseDown={() => handleSpecialClick(card.value)}
             style={{ width: "50px", height: "75px", cursor: "pointer" }}
           />
         ))}
