@@ -3,7 +3,7 @@ import { useGameAdd } from "../hooks/useGameAdd";
 import { useGameSubtract } from "../hooks/useGameSubtract";
 import { useGameMultiply } from "../hooks/useGameMultiply";
 import { useGameDivide } from "../hooks/useGameDivide";
-import { ToastContainer, toast } from "react-toastify";
+import {ToastContainer, toast, Slide, Flip} from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Answer from "./Answer";
 import Header from "./Header";
@@ -194,7 +194,8 @@ const getResponsiveFontSize = (text) => {
                 });
                 toast.success("잘했어요! 🎉", {
                     position: "top-center",
-                    autoClose: 1000,
+                    autoClose: 400,
+                    transition: Flip,
                     hideProgressBar: true,
                     closeOnClick: true,
                     pauseOnHover: false,
@@ -215,7 +216,8 @@ const getResponsiveFontSize = (text) => {
                 });
                 toast.error("아쉽지만 틀렸어요. 다시해봐요! 🥴", {
                     position: "top-center",
-                    autoClose: 1000,
+                    autoClose: 400,
+                    transition: Flip,
                     hideProgressBar: true,
                     closeOnClick: true,
                     pauseOnHover: false,
@@ -226,7 +228,7 @@ const getResponsiveFontSize = (text) => {
                     setHasSubmitted(false);
                 }, 1000);
             }
-        }, 500);
+        }, 0);
     };
 
     const handleNewProblem = () => {
