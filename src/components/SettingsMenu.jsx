@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, useState} from "react";
+import React, {useRef, useState} from "react";
 
 function SettingsMenu({
   onNewProblem,
@@ -14,6 +14,7 @@ function SettingsMenu({
   const [confirmReset, setConfirmReset] = useState(false);
 
   function handleEventCommon(e,run) {
+    // Only preventDefault for mouse events, not touch events
     if (e.type !== 'touchstart') {
       e.preventDefault();
     }
@@ -41,8 +42,7 @@ function SettingsMenu({
     });
   };
 
-  const handleAction = (action, e, actionName = "generic") => {
-    // Only preventDefault for mouse events, not touch events
+  const handleAction = (action, e) => {
     handleEventCommon(e,()=> {
       action();
       setIsOpen(false);
@@ -86,29 +86,6 @@ function SettingsMenu({
       callback(e);
     }
   };
-
-  useEffect(() => {
-    const handleClickOutside = (e) => {
-      if (e.target.className === "settings-modal-backdrop") {
-        setIsOpen(false);
-        setConfirmReset(false);
-      }
-    };
-
-    const handleEsc = (e) => {
-      if (e.key === "Escape") {
-        setIsOpen(false);
-        setConfirmReset(false);
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    document.addEventListener("keydown", handleEsc);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-      document.removeEventListener("keydown", handleEsc);
-    };
-  }, []);
 
   return (
     <>
