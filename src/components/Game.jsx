@@ -3,7 +3,7 @@ import { useGameAdd } from "../hooks/useGameAdd";
 import { useGameSubtract } from "../hooks/useGameSubtract";
 import { useGameMultiply } from "../hooks/useGameMultiply";
 import { useGameDivide } from "../hooks/useGameDivide";
-import {ToastContainer, toast, Slide, Flip} from "react-toastify";
+import {ToastContainer, toast, Flip} from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Answer from "./Answer";
 import Header from "./Header";
@@ -15,8 +15,6 @@ import gearIcon from "../assets/images/icon_settings_gear2.png";
 import aboutIcon from "../assets/images/icon_about2b.png";
 import ImageButton from "./ImageButton";
 import enterButton from "../assets/images/button_image_enter.png";
-import newButton from "../assets/images/button_image_new_problem.png";
-import resetButton from "../assets/images/button_image_reset_score.png";
 import deleteButton from "../assets/images/button_image_delete.png";
 import { useGameSounds } from "../hooks/useGameSound";
 import SettingsMenu from "./SettingsMenu";
@@ -68,14 +66,14 @@ const getResponsiveFontSize = (text) => {
                 division: { type: "easy" }
             },
             "보통": {
-                addition: { min: 1, max: 50 },
-                subtraction: { min: 1, max: 50, allowNegative: false },
+                addition: { min: 1, max: 100 },
+                subtraction: { min: 1, max: 100, allowNegative: false },
                 multiplication: { min: 5, max: 10 },
                 division: { type: "medium" }
             },
             "어려움": {
-                addition: { min: 1, max: 100 },
-                subtraction: { min: 1, max: 100, allowNegative: true },
+                addition: { min: 100, max: 999 },
+                subtraction: { min: 100, max: 999, allowNegative: true },
                 multiplication: { min: 7, max: 12 },
                 division: { type: "hard" }
             }

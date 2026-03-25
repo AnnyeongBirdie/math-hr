@@ -35,8 +35,8 @@ export function useGameDivide(config = { type: "easy" }) {
                 solution = term1 / term2;
             } else {
                 // Regular perfect division
-                term2 = Math.floor(Math.random() * 9) + 1; // 1 to 9
-                const multiplier = Math.floor(Math.random() * 12) + 1; // 1 to 12
+                term2 = Math.floor(Math.random() * 20) + 1; // 1 to 20
+                const multiplier = Math.floor(Math.random() * 30) + 1; // 1 to 30
                 term1 = term2 * multiplier;
                 solution = term1 / term2;
             }
