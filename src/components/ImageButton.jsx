@@ -28,6 +28,7 @@ function ImageButton({ src, alt = "", onAction, style = {} }) {
       alt={alt}
       role="button"
       tabIndex="0"
+      draggable="false"
       onMouseDown={handleAction}
       onTouchStart={handleAction}
       onKeyDown={handleKeyDown}
